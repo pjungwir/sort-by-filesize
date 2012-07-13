@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+use strict;
+use Data::Dumper;
+
+my @lines;
+my $in_reverse = 0;
+
+if (scalar @ARGV > 0 and $ARGV[0] eq '-r') {
+  shift @ARGV;
+  $in_reverse = 1;
+}
+
+while (<>) {
+	chomp;
+	push @lines, [unabbrev($_), $_];
+	# print "$_: ", unabbrev($_), "\n";
+}
+
+# print Dumper \@lines;
+
+if ($in_reverse) {
+  for my $line (reverse sort { return $a->[0] <=> $b->[0] } @lines) {
+    print $line->[1], "\n";
+  }
+} else {
+  for my $line (sort { return $a->[0] <=> $b->[0] } @lines) {
+    print $line->[1], "\n";
+  }
+}
+
+sub unabbrev {
+	my $val = shift;
+	if ($val =~ m/^\s*(\d+(\.\d+)?)([KMGB]?)/) {
+		if ($3 eq 'K') {
+			$val = $1 * 1000;
+		} elsif ($3 eq 'M') {
+			$val = $1 * 1000000;
+		} elsif ($3 eq 'G') {
+			$val = $1 * 1000000000;
+		} else { # B or nothing
+			$val = $1;
+		}
+	}
+	return $val;
+}
+
